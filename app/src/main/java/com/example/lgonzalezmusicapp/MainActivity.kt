@@ -54,10 +54,13 @@ class MainActivity : ComponentActivity() {
 
                 LaunchedEffect(Unit) {
                     try {
+                        isLoading = true
+                        error = null
                         albums = apiService.getAlbums()
                         isLoading = false
                     } catch (e: Exception) {
-                        error = e.message
+                        e.printStackTrace()
+                        error = "Error de red: ${e.localizedMessage}. Por favor, verifica tu conexión a internet."
                         isLoading = false
                     }
                 }
