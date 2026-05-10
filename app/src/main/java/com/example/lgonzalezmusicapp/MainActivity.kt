@@ -60,7 +60,8 @@ class MainActivity : ComponentActivity() {
                         isLoading = false
                     } catch (e: Exception) {
                         e.printStackTrace()
-                        error = "Error de red: ${e.localizedMessage}. Por favor, verifica tu conexión a internet."
+                        // Fallback to Mock Data if API fails
+                        albums = Album.getMockAlbums()
                         isLoading = false
                     }
                 }
