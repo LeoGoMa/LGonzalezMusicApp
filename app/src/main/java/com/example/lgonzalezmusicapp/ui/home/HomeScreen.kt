@@ -17,10 +17,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.example.lgonzalezmusicapp.data.model.Album
 
 @Composable
@@ -31,7 +33,7 @@ fun HomeScreen(
 ) {
     Scaffold(
         bottomBar = { MiniPlayer(album = albums.firstOrNull()) },
-        containerColor = Color(0xFFF3E5F5) // Light purple background
+        containerColor = Color(0xFFF3E5F5)
     ) { padding ->
         LazyColumn(
             modifier = modifier
@@ -39,7 +41,6 @@ fun HomeScreen(
                 .padding(padding)
         ) {
             item { HomeHeader() }
-            
             item {
                 SectionHeader(title = "Albums")
                 LazyRow(
@@ -51,11 +52,7 @@ fun HomeScreen(
                     }
                 }
             }
-
-            item {
-                SectionHeader(title = "Recently Played")
-            }
-
+            item { SectionHeader(title = "Recently Played") }
             items(albums) { album ->
                 RecentlyPlayedItem(album = album, onClick = { onAlbumClick(album) })
             }
@@ -87,17 +84,8 @@ fun HomeHeader() {
                 Icon(Icons.Default.Search, contentDescription = "Search", tint = Color.White)
             }
             Spacer(modifier = Modifier.height(24.dp))
-            Text(
-                text = "Buenos días!",
-                color = Color.White,
-                fontSize = 18.sp
-            )
-            Text(
-                text = "Leonel!",
-                color = Color.White,
-                fontSize = 28.sp,
-                fontWeight = FontWeight.Bold
-            )
+            Text(text = "Buenos días!", color = Color.White, fontSize = 18.sp)
+            Text(text = "Leonel!", color = Color.White, fontSize = 28.sp, fontWeight = FontWeight.Bold)
         }
     }
 }
@@ -105,44 +93,33 @@ fun HomeHeader() {
 @Composable
 fun SectionHeader(title: String) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp),
+        modifier = Modifier.fillMaxWidth().padding(16.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(
-            text = title,
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.Black
-        )
-        Text(
-            text = "See more",
-            color = Color(0xFF7E57C2),
-            fontSize = 14.sp
-        )
+        Text(text = title, fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.Black)
+        Text(text = "See more", color = Color(0xFF7E57C2), fontSize = 14.sp)
     }
 }
 
 @Composable
 fun AlbumCard(album: Album, onClick: () -> Unit) {
+    val context = LocalContext.current
     Card(
-        modifier = Modifier
-            .width(200.dp)
-            .height(220.dp),
+        modifier = Modifier.width(200.dp).height(220.dp),
         shape = RoundedCornerShape(24.dp),
         onClick = onClick
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
             AsyncImage(
-                model = album.imageUrl,
+                model = ImageRequest.Builder(context)
+                    .data(album.image)
+                    .crossfade(true)
+                    .build(),
                 contentDescription = null,
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Crop
             )
-            
-            // Bottom Info Overlay
             Box(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
@@ -158,31 +135,11 @@ fun AlbumCard(album: Album, onClick: () -> Unit) {
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = album.title,
-                            color = Color.White,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 14.sp,
-                            maxLines = 1
-                        )
-                        Text(
-                            text = album.artist,
-                            color = Color.LightGray,
-                            fontSize = 12.sp,
-                            maxLines = 1
-                        )
+                        Text(text = album.title, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 14.sp, maxLines = 1)
+                        Text(text = album.artist, color = Color.LightGray, fontSize = 12.sp, maxLines = 1)
                     }
-                    Surface(
-                        shape = CircleShape,
-                        color = Color.White,
-                        modifier = Modifier.size(32.dp)
-                    ) {
-                        Icon(
-                            Icons.Default.PlayArrow,
-                            contentDescription = null,
-                            tint = Color.Black,
-                            modifier = Modifier.padding(4.dp)
-                        )
+                    Surface(shape = CircleShape, color = Color.White, modifier = Modifier.size(32.dp)) {
+                        Icon(Icons.Default.PlayArrow, contentDescription = null, tint = Color.Black, modifier = Modifier.padding(4.dp))
                     }
                 }
             }
@@ -192,43 +149,33 @@ fun AlbumCard(album: Album, onClick: () -> Unit) {
 
 @Composable
 fun RecentlyPlayedItem(album: Album, onClick: () -> Unit) {
+    val context = LocalContext.current
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         onClick = onClick
     ) {
         Row(
-            modifier = Modifier
-                .padding(12.dp)
-                .fillMaxWidth(),
+            modifier = Modifier.padding(12.dp).fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
             AsyncImage(
-                model = album.imageUrl,
+                model = ImageRequest.Builder(context)
+                    .data(album.image)
+                    .crossfade(true)
+                    .build(),
                 contentDescription = null,
-                modifier = Modifier
-                    .size(56.dp)
-                    .clip(RoundedCornerShape(12.dp)),
+                modifier = Modifier.size(56.dp).clip(RoundedCornerShape(12.dp)),
                 contentScale = ContentScale.Crop
             )
             Spacer(modifier = Modifier.width(16.dp))
             Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = album.title,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp
-                )
-                Text(
-                    text = "${album.artist} • Popular Song",
-                    color = Color.Gray,
-                    fontSize = 14.sp
-                )
+                Text(text = album.title, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                Text(text = "${album.artist} • Popular Song", color = Color.Gray, fontSize = 14.sp)
             }
-            IconButton(onClick = { /* More actions */ }) {
+            IconButton(onClick = { }) {
                 Icon(Icons.Default.MoreVert, contentDescription = null, tint = Color.Gray)
             }
         }
@@ -238,53 +185,32 @@ fun RecentlyPlayedItem(album: Album, onClick: () -> Unit) {
 @Composable
 fun MiniPlayer(album: Album?) {
     if (album == null) return
-    
+    val context = LocalContext.current
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp),
+        modifier = Modifier.fillMaxWidth().padding(16.dp),
         shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1225)) // Dark purple
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1225))
     ) {
         Row(
-            modifier = Modifier
-                .padding(12.dp)
-                .fillMaxWidth(),
+            modifier = Modifier.padding(12.dp).fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
             AsyncImage(
-                model = album.imageUrl,
+                model = ImageRequest.Builder(context)
+                    .data(album.image)
+                    .crossfade(true)
+                    .build(),
                 contentDescription = null,
-                modifier = Modifier
-                    .size(48.dp)
-                    .clip(RoundedCornerShape(8.dp)),
+                modifier = Modifier.size(48.dp).clip(RoundedCornerShape(8.dp)),
                 contentScale = ContentScale.Crop
             )
             Spacer(modifier = Modifier.width(16.dp))
             Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = album.title,
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 14.sp
-                )
-                Text(
-                    text = album.artist,
-                    color = Color.LightGray,
-                    fontSize = 12.sp
-                )
+                Text(text = album.title, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                Text(text = album.artist, color = Color.LightGray, fontSize = 12.sp)
             }
-            Surface(
-                shape = CircleShape,
-                color = Color.White,
-                modifier = Modifier.size(36.dp)
-            ) {
-                Icon(
-                    Icons.Default.PlayArrow,
-                    contentDescription = null,
-                    tint = Color.Black,
-                    modifier = Modifier.padding(6.dp)
-                )
+            Surface(shape = CircleShape, color = Color.White, modifier = Modifier.size(36.dp)) {
+                Icon(Icons.Default.PlayArrow, contentDescription = null, tint = Color.Black, modifier = Modifier.padding(6.dp))
             }
         }
     }

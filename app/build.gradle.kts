@@ -49,6 +49,7 @@ dependencies {
     // Networking
     implementation(libs.retrofit)
     implementation(libs.retrofit.gson)
+    implementation(libs.okhttp.logging)
 
     // Image Loading
     implementation(libs.coil.compose)
