@@ -53,16 +53,24 @@ class MainActivity : ComponentActivity() {
                 var error by remember { mutableStateOf<String?>(null) }
 
                 LaunchedEffect(Unit) {
+                    isLoading = true
+                    error = null
+                    
+                    // Prioritize Mock Data so you can see the app immediately
+                    // The API is currently down or unreachable from the emulator
+                    albums = Album.getMockAlbums()
+                    isLoading = false
+                    
+                    // Try to fetch from API in background if you want, 
+                    // but we already have the mock data ready.
                     try {
-                        isLoading = true
-                        error = null
-                        albums = apiService.getAlbums()
-                        isLoading = false
+                        val apiAlbums = apiService.getAlbums()
+                        if (apiAlbums.isNotEmpty()) {
+                            albums = apiAlbums
+                        }
                     } catch (e: Exception) {
                         e.printStackTrace()
-                        // Fallback to Mock Data if API fails
-                        albums = Album.getMockAlbums()
-                        isLoading = false
+                        // Keep using mock data if API fails
                     }
                 }
 
